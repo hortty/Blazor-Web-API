@@ -1,0 +1,17 @@
+﻿################################################################################
+# Este arquivo .gitignore foi criado automaticamente pelo Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/BlazorWebApp/obj
+/WebAPI/.vs/Movie/FileContentIndex
+/WebAPI/Movie.Api/.vs
+/WebAPI/Movie.Api/bin/Debug/net6.0
+/WebAPI/Movie.Api/obj
+/WebAPI/Movie.Application/bin/Debug/net6.0
+/WebAPI/Movie.Application/obj
+/WebAPI/Movie.Domain/bin/Debug/net6.0
+/WebAPI/Movie.Domain/obj
+/WebAPI/Movie.Infrastructure/bin/Debug/net6.0
+/WebAPI/Movie.Infrastructure/obj
+/WebAPI/.vs
