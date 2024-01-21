@@ -1,0 +1,71 @@
+﻿@using BlazorWebApp.ViewObjects;
+@using Microsoft.JSInterop
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager UriHelper
+@inject BlazorWebApp.Interface.ICliente api
+@inject Microsoft.JSInterop.IJSRuntime jsRuntime
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@using BlazorWebApp.Util
+@using System.IO
+@using System
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+@using System.Timers;
+@inject IDialogService DialogService
+@inject IConfiguration Configuration
+
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <img src="assets/logo3.png" alt="image-logo" class="image-logo">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse navbar-global-itens" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link list-itens" href="home">Home</a>
+                <a class="nav-link list-itens" href="shopping">Shopping Cart</a>
+                <a class="nav-link list-itens">Trending</a>
+            </div>
+
+            <form class="example-form">
+                <div class="form-group">
+                    <label for="movieName">Search:</label>
+                    <input type="text" class="form-control" id="movieName" @bind="movieName" placeholder="Example: Titanic">
+                </div>
+            </form>
+
+            <div class="icon-animation">
+                <img src="assets/icone3.png" alt="image-user" class="image-user">
+                <a href="login" class="login-item">Sign in</a>
+                <!-- <span class="login-item">Please, login</span> -->
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code {
+    private string movieName = "";
+
+    private async Task SearchMovies()
+    {
+        var getFilmDto = new GetFilmDto { Name = movieName };
+
+        if (!string.IsNullOrEmpty(getFilmDto.Name))
+        {
+            var films = await filmService.GetByName(getFilmDto);
+            globalService.FilmsSubject.OnNext(films);
+        }
+        else
+        {
+            var films = await filmService.GetAll();
+            globalService.FilmsSubject.OnNext(films);
+        }
+    }
+}

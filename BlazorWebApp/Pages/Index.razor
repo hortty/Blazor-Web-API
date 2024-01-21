@@ -1,7 +1,86 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@using BlazorWebApp.ViewObjects;
+@using Microsoft.JSInterop
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager UriHelper
+@inject BlazorWebApp.Interface.ICliente api
+@inject Microsoft.JSInterop.IJSRuntime jsRuntime
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@using BlazorWebApp.Util
+@using System.IO
+@using System
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+@using System.Timers;
+@inject IDialogService DialogService
+@inject IConfiguration Configuration
 
-Welcome to your new app.
+<div class="container text-center">
+    <div class="row row-cols-1 row-cols-md-4 row-cols-sm-2">
+        @foreach (var filme in filmes)
+        {
+            var index = filmes.IndexOf(filme);
+            <div class="grid-container">
+                <div class="grid-item">
+                    <div class="card">
+                        <img src="@imagemSrc[index]" alt="@filme.Name" class="card-img-top">
+                        <div class="card-content">
+                            <h5 class="card-title">@filme.Name</h5>
+                            <p class="card-text">@filme.Description</p>
+                            <p class="card-text" style="border-top: 0.1rem solid black; padding-top: 0.5rem;">$ @(filme.Price.ToString("F2"))</p>
+                        </div>
+                    </div>
+                    <button @onclick="() => Comprar(filme)" class="btn btn-primary buy-button-item" style="max-width: 30rem;">Buy</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    private List<FoundFilmDto> filmes = new List<FoundFilmDto>();
+    private List<string> imagemSrc = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        var filmes =  FilmService.GetAll();
+        ChangeValues(filmes);
+            StateHasChanged(); 
+    }
+
+    private void ChangeValues(List<FoundFilmDto> films)
+    {
+        this.filmes = films;
+        this.imagemSrc = new List<string>();
+
+        foreach (var filme in this.filmes)
+        {
+            if (filme.Imagem.Length > 0)
+            {
+                this.imagemSrc.Add($"data:image/jpeg;base64,{filme.Imagem}");
+            }
+        }
+    }
+
+    private void Comprar(FoundFilmDto film)
+    {
+        // TODO: shoppingCartId relacao com ShoppingCart, o qual possui userId
+        var shoppingCartMovieDto = new CreateShoppingCartMovieDto
+        {
+            Amount = 1,
+            ShoppingCartId = 1,
+            FilmId = film.Id,
+            Price = film.Price,
+            Name = film.Name
+        };
+
+        ShoppingCartMovieService.Create(shoppingCartMovieDto).Subscribe(created => Console.WriteLine(created));
+    }
+}

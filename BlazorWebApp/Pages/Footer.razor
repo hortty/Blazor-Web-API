@@ -1,0 +1,75 @@
+﻿@using BlazorWebApp.ViewObjects;
+@using Microsoft.JSInterop
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager UriHelper
+@inject BlazorWebApp.Interface.ICliente api
+@inject Microsoft.JSInterop.IJSRuntime jsRuntime
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@using BlazorWebApp.Util
+@using System.IO
+@using System
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+@using Microsoft.AspNetCore.Components.Web.Extensions.Head
+@using System.Timers;
+@inject IDialogService DialogService
+@inject IConfiguration Configuration
+
+<div class="Contato">
+    <div class="meio-contato">
+        <a class="link-item" @onclick="OpenDialog">About</a>
+        <h3 class="link-item" @onclick="OpenDialog">PopcornMovies</h3>
+        <div class="icon-list">
+            <a href="https://www.instagram.com/" class="link-item" target="_blank">
+                <FaIcon Style="font-size: 25px;" Icon="@FaIcon.FaInstagram" Href="www.youtube.com"></FaIcon>
+            </a>
+            <a href="https://www.facebook.com/" target="_blank" class="link-item">
+                <FaIcon Style="font-size: 25px;" Icon="@FaIcon.FaFacebook"></FaIcon>
+            </a>
+            <a href="https://www.twitter.com/" target="_blank" class="link-item">
+                <FaIcon Style="font-size: 25px;" Icon="@FaIcon.FaTwitter"></FaIcon>
+            </a>
+            <a href="https://www.youtube.com/" target="_blank" class="link-item">
+                <FaIcon Icon="@FaIcon.FaYoutube" Style="font-size: 25px;"></FaIcon>
+            </a>
+        </div>
+    </div>
+
+    <div class="meio-contato">
+        <h3>Explore</h3>
+        <span>Home</span>
+        <span>Featured</span>
+        <span>New</span>
+        <span>Contact</span>
+    </div>
+
+    <div class="meio-contato">
+        <h3>Shopping</h3>
+        <span>Store</span>
+        <span>Trending</span>
+        <span>Ranking</span>
+        <span>Free</span>
+    </div>
+</div>
+
+<div class="last-text">
+    <p>Copyright © 2023 All rights reserved</p>
+</div>
+
+@code {
+    private string data = "PopcornMovies is a website of the best movies";
+
+    private async Task OpenDialog()
+    {
+        var result = await JsRuntime.InvokeAsync<bool>("confirm", data);
+        if (result)
+        {
+            // TODO: deletar
+        }
+    }
+}
