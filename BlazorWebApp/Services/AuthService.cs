@@ -4,7 +4,6 @@ using BlazorWebApp.Util;
 using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace BlazorWebApp.Services
@@ -62,6 +61,7 @@ namespace BlazorWebApp.Services
                 request.Content = GetStringContent(user);
 
                 var response = await this._httpClient.SendAsync(request);
+
                 var responseAsString = await response.Content.ReadAsStringAsync();
                 return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO>(responseAsString);
             }

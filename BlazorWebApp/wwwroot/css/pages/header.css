@@ -1,0 +1,146 @@
+﻿.image-logo {
+    max-width: 3.5rem;
+    max-height: 3.5rem;
+    border: 2px solid rgba(0, 0, 0, 0.486);
+    border-radius: 100%;
+    margin-right: 2rem;
+}
+
+.container-fluid {
+    max-height: 3rem;
+}
+
+.image-logo:hover {
+    animation: spinY 0.8s linear forwards;
+}
+
+.navbar {
+    background-color: mediumpurple;
+}
+
+.list-itens {
+    text-decoration: none;
+    color: white;
+    transition: transform 0.2s ease-in;
+    position: relative;
+    margin-left: 1rem;
+    padding-bottom: 0.6rem;
+    cursor: pointer;
+}
+
+.list-itens:hover {
+    color: rgb(23, 0, 128);
+}
+
+.list-itens:before {
+    content: ' ';
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 0px;
+    height: 1px;
+    background-color: white;
+    transition: all 1s ease;
+}
+
+.list-itens:hover:before {
+    width: 100%;
+}
+
+mat-form-field {
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 0px;
+    min-width: 35rem;
+}
+
+.navbar-global-itens {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center;
+}
+
+.user-account-item {
+    font-size: 2rem;
+}
+
+.image-user {
+    max-width: 2rem;
+    max-height: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.486);
+    border-radius: 100%;
+    margin-right: 0.7rem;
+}
+
+.example-form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.example-full-width {
+    width: 100%;
+}
+
+.login-item {
+    color: white;
+    text-decoration: none;
+}
+
+.image-user {
+    position: relative;
+    top: 0;
+    transition: top 0.3s ease-out;
+    max-width: 2rem;
+    max-height: 2rem;
+    border-radius: 100%;
+    margin-right: 0.7rem;
+}
+
+.image-user:hover {
+    animation: spin 0.7s linear forwards;
+}
+
+.icon-animation:hover {
+    cursor: pointer;
+    animation: jump 0.5s;
+}
+
+@keyframes spinY {
+    from {
+        transform: rotateY(0deg);
+    }
+
+    to {
+        transform: rotateY(360deg);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes jump {
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+
+@media screen and (min-width: 600px) and (max-width: 1100px) {
+    .example-form {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .example-form {
+        display: none;
+    }
+}

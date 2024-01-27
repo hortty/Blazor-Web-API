@@ -1,17 +1,29 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
+    @* <div class="sidebar">
         <NavMenu />
-    </div>
+    </div> *@
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+    <div class="d-flex flex-column vw-100">
+        <BlazorWebApp.Pages.Header></BlazorWebApp.Pages.Header>
+
+        <div class="main">
+            <div class="top-row px-4">
+                <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            </div>
+
+            <div class="content px-4">
+                @Body
+            </div>
+        
         </div>
 
-        <div class="content px-4">
-            @Body
-        </div>
+        <BlazorWebApp.Pages.Footer></BlazorWebApp.Pages.Footer>
     </div>
+
+
 </div>
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />

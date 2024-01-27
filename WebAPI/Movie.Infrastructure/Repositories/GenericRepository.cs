@@ -22,7 +22,7 @@ namespace Movie.Infrastructure.Repositories
             _dbSet = dbContext.Set<TEntity>();
         }
 
-        public async Task<TEntity> Create(TEntity entity)
+        public async virtual Task<TEntity> Create(TEntity entity)
         {
             var createdEntity = await _dbSet.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
@@ -30,7 +30,7 @@ namespace Movie.Infrastructure.Repositories
             return createdEntity.Entity;
         }
 
-        public async Task<TEntity> Delete(TEntity entity)
+        public async virtual Task<TEntity> Delete(TEntity entity)
         {
             var foundEntity = await ListById(entity);
 
@@ -43,7 +43,7 @@ namespace Movie.Infrastructure.Repositories
             return removedEntity.Entity;
         }
 
-        public async Task<IEnumerable<TEntity>> ListAll()
+        public async virtual Task<IEnumerable<TEntity>> ListAll()
         {
             var foundEntities = await _dbSet.AsNoTracking().Skip(0).Take(10).ToListAsync();
 
@@ -53,7 +53,7 @@ namespace Movie.Infrastructure.Repositories
             return foundEntities;
         }
 
-        public async Task<TEntity> ListById(TEntity entity)
+        public async virtual Task<TEntity> ListById(TEntity entity)
         {
             var foundEntity = await _dbSet.FindAsync(entity.Id);
 
@@ -63,7 +63,7 @@ namespace Movie.Infrastructure.Repositories
             return foundEntity;
         }
 
-        public async Task<TEntity> Update(TEntity entity)
+        public async virtual Task<TEntity> Update(TEntity entity)
         {
             var foundEntity = await _dbSet.FindAsync(entity.Id);
 
@@ -71,15 +71,25 @@ namespace Movie.Infrastructure.Repositories
             {
                 throw new InvalidOperationException($"Entity not found.");
             }
-            else
+
+            var props = entity.GetType().GetProperties();
+
+            foreach(var prop in props)
             {
-                _dbContext.Entry(foundEntity).State = EntityState.Detached;
+                var propValue = prop.GetValue(entity);
+
+                if((propValue is not int && propValue != null) || (propValue is int && (int)propValue != 0))
+                {
+                    foundEntity!.GetType()?.GetProperty(prop.Name)?.SetValue(foundEntity, propValue);
+                }
+                
             }
 
-            _dbContext.Entry(entity).State = EntityState.Modified;
-            _dbContext.SaveChanges();
+            _dbContext.Entry(foundEntity).CurrentValues.SetValues(foundEntity!);
+            var updatedEntity = _dbContext.Entry(foundEntity).Entity;
+            await _dbContext.SaveChangesAsync();
 
-            return entity;
+            return updatedEntity;
         }
     }
 }

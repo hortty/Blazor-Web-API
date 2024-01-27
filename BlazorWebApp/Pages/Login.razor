@@ -1,0 +1,45 @@
+﻿@page "/login"
+
+@using BlazorWebApp.DTOs
+@using BlazorWebApp.Services
+@using System
+@using MudBlazor
+@inject ShoppingCartMovieService shoppingCartMovieService
+
+<head>
+    <link rel="stylesheet" href="/css/pages/index.css" />
+</head>
+<body>
+    <div class="align-items">
+        <EditForm Model="@userInfo" OnValidSubmit="LoginUser" class="form-container">
+            <div class="items-container">
+                <div class="form-group">
+                    <label for="username">Login</label>
+                    <InputText class="form-control" id="username" @bind-Value="userInfo.Login" name="username" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <InputText class="form-control" id="password" @bind-Value="userInfo.Password" name="password" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <a href="/account" class="sign-in-item">Create new customer</a>
+            </div>
+        </EditForm>
+    </div>
+</body>
+
+@code {
+    private UserDTO userInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userInfo = new UserDTO();
+
+        await base.OnInitializedAsync();
+    }
+
+    private void LoginUser()
+    {
+
+    }
+}

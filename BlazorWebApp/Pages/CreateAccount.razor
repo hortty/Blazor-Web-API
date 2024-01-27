@@ -1,68 +1,81 @@
-﻿@using BlazorWebApp.ViewObjects;
-@using Microsoft.JSInterop
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor httpContextAccessor
-@using Microsoft.AspNetCore.Components.Authorization
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager UriHelper
-@inject BlazorWebApp.Interface.ICliente api
-@inject Microsoft.JSInterop.IJSRuntime jsRuntime
-@using Microsoft.Extensions.Configuration
-@inject IConfiguration Configuration
-@using BlazorWebApp.Util
-@using System.IO
-@using System
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@inject ProtectedSessionStorage ProtectedSessionStore
-@using Microsoft.AspNetCore.Components.Web.Extensions.Head
-@using System.Timers;
-@inject IDialogService DialogService
-@inject IConfiguration Configuration
+﻿@page "/create-account"
 
-<div class="align-items">
-    <EditForm Model="@account" OnValidSubmit="CreateAccount">
-        <div class="items-container">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <InputText id="name" @bind-Value="account.Name" class="form-control" />
-                <ValidationMessage For="@(() => account.Name)" />
+@using BlazorWebApp.DTOs.Customer
+@using BlazorWebApp.Interfaces
+@using BlazorWebApp.Util
+@using System
+@using MudBlazor
+@inject IDialogService dialogService
+@inject ICustomerService customerService
+
+<head>
+    <link rel="stylesheet" href="/css/pages/createAccount.css" />
+</head>
+<body>
+    <div class="align-items">
+        <EditForm EditContext="editContext" OnValidSubmit="CreateAc">
+            <div class="items-container">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <InputText id="name" @bind-Value="account.Name" class="form-control" />
+                    <ValidationMessage For="@(() => account.Name)" />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <InputText id="phone" @bind-Value="account.Phone" class="form-control" />
+                    <ValidationMessage For="@(() => account.Phone)" />
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <InputText id="address" @bind-Value="account.Address" class="form-control" />
+                    <ValidationMessage For="@(() => account.Address)" />
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <InputNumber id="age" @bind-Value="account.Age" class="form-control" />
+                    <ValidationMessage For="@(() => account.Age)" />
+                </div>
+                <button type="submit" class="btn btn-primary">Create Customer</button>
             </div>
-            <div class="form-group">
-                <label for="phone">Phone</label>
-                <InputText id="phone" @bind-Value="account.Phone" class="form-control" />
-                <ValidationMessage For="@(() => account.Phone)" />
-            </div>
-            <div class="form-group">
-                <label for="address">Address</label>
-                <InputText id="address" @bind-Value="account.Address" class="form-control" />
-                <ValidationMessage For="@(() => account.Address)" />
-            </div>
-            <div class="form-group">
-                <label for="age">Age</label>
-                <InputNumber id="age" @bind-Value="account.Age" class="form-control" />
-                <ValidationMessage For="@(() => account.Age)" />
-            </div>
-            <button type="submit" class="btn btn-primary">Create Customer</button>
-        </div>
-    </EditForm>
-</div>
+        </EditForm>
+    </div>
+</body>
 
 @code {
-    private Account account = new Account();
+    private CreateCustomerDto account = new CreateCustomerDto();
 
-    private void CreateAccount()
+    EditContext editContext;
+
+    protected override void OnInitialized()
     {
-        account.UserId = 1;
-
-        if (accountForm.IsValid())
+        try
         {
-            customerService.CreateAccount(account);
+            editContext = new EditContext(account);
         }
-        else
+        catch(Exception ex)
         {
-            accountForm.MarkAllAsTouched();
-            accountForm.Validate();
+            return;
+        }
+    }
+
+    private async Task CreateAc()
+    {
+        try
+        {
+            account.UserId = Guid.NewGuid();
+
+            if (!editContext.Validate())
+            {
+                await customerService.CreateCustomer(account);
+            }
+            else
+            {
+                editContext.Validate();
+            }
+        }
+        catch(Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message);
         }
     }
 }

@@ -23,6 +23,5 @@ namespace Movie.Domain.Models
         [Required]
         public long Amount { get; set; }
 
-        public byte[]? Image { get; set; }
     }
 }

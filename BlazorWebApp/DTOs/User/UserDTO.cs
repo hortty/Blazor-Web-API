@@ -5,7 +5,6 @@ namespace BlazorWebApp.DTOs
 {
     public class UserDTO : BaseDTO
     {
-        public UserDTO() { }
 
         [Required(ErrorMessage = "Nome é obrigatório")]
         public string Name { get; set; }
@@ -13,7 +12,7 @@ namespace BlazorWebApp.DTOs
         [Required(ErrorMessage = "Login é necessário")]
         public string Login { get; set; }
 
-        [Required(ErrorMessage = "Senha é necessário")]
+        [Required(ErrorMessage = "Senha é necessária")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Email é obrigatório")]

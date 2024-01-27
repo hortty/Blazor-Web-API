@@ -9,8 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-//using MudBlazor.Services;
+using MudBlazor.Services;
 using BlazorWebApp.Util;
+using BlazorWebApp.Interfaces;
+using BlazorWebApp.Services;
 
 namespace BlazorWebApp
 {
@@ -29,9 +31,15 @@ namespace BlazorWebApp
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            //services.AddMudBlazor();
+            services.AddMudServices();
+            services.AddHttpClient();
 
             services.Configure<ConfigAPI>(Configuration.GetSection("configAPI"));
+
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IFilmService, FilmService>();
+            services.AddScoped<IShoppingCartMovieService, ShoppingCartMovieService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,0 +1,126 @@
+﻿@page "/shopping-cart"
+
+@using BlazorWebApp.DTOs
+@using BlazorWebApp.DTOs.ShoppingCartMovieDTO
+@using BlazorWebApp.Interfaces
+@using BlazorWebApp.Services
+@using BlazorWebApp.Util
+@using System
+@using MudBlazor
+@inject IShoppingCartMovieService shoppingCartMovieService
+@inject IDialogService dialogService
+
+<head>
+    <link rel="stylesheet" href="/css/pages/index.css" />
+</head>
+<body>
+    <h1 class="text-center mb-4">Carrinho de compras</h1>
+    @if (cartItems.Count == 0 || loading)
+    {
+        <div class="text-center mb-4">
+            <h3>Empty</h3>
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover mb-4">
+            <thead>
+                <tr>
+                    <th>Film</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Delete Item</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in cartItems)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@string.Format("{0:C}", item.Price)</td>
+                        <td>@string.Format("{0:C}", item.Amount * item.Price)</td>
+                        <td><button style="cursor: pointer;" @onclick="(() => DeleteItem(item.Id))">delete</button></td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-right">Total:</td>
+                    <td>@string.Format("{0:C}", GetTotal())</td>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="text-right">
+            <button type="button" class="btn btn-danger" @onclick="ClearCart">Limpar carrinho</button>
+            <button type="button" class="btn btn-primary ml-2" @onclick="Checkout">Finalizar compra</button>
+        </div>
+    }
+</body>
+
+@code {
+    List<FoundShoppingCartMovieDto> cartItems = new List<FoundShoppingCartMovieDto>();
+    bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+
+        try
+        {
+            var result = await shoppingCartMovieService.GetAsync();
+
+            if (!result.Success)
+                throw new Exception(result.Message);
+
+            cartItems = result.ResultObj;
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    decimal GetTotal()
+    {
+        return cartItems.Sum(item => item.Price * item.Amount);
+    }
+
+    void ClearCart()
+    {
+        cartItems.Clear();
+    }
+
+    void Checkout()
+    {
+        Console.WriteLine("Compra finalizada!");
+    }
+
+    async Task DeleteItem(Guid id)
+    {
+        var index = cartItems.FindIndex(cartItem => cartItem.Id == id);
+
+        var deleteShoppingCartMovieDto = new DeleteShoppingCartMovieDTO
+        {
+            Id = id
+        };
+
+        try
+        {
+            var deletedItem = await shoppingCartMovieService.DeleteAsync(deleteShoppingCartMovieDto);
+            cartItems.RemoveAt(index);
+        }
+        catch (Exception)
+        {
+            // Handle error
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}
