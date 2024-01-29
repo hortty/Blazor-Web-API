@@ -5,8 +5,12 @@
 @using BlazorWebApp.Util
 @using System
 @using MudBlazor
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Cryptography
+@using System.Text
 @inject IDialogService dialogService
 @inject ICustomerService customerService
+@inject NavigationManager navigationManager
 
 <head>
     <link rel="stylesheet" href="/css/pages/createAccount.css" />
@@ -18,24 +22,32 @@
                 <div class="form-group">
                     <label for="name">Name</label>
                     <InputText id="name" @bind-Value="account.Name" class="form-control" />
-                    <ValidationMessage For="@(() => account.Name)" />
+                </div>
+                <div class="form-group">
+                    <label for="login">Login</label>
+                    <InputText id="login" @bind-Value="account.Login" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <InputText id="email" type="email" @bind-Value="account.Email" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <InputText id="senha" type="password" @bind-Value="account.Password" class="form-control" />
                 </div>
                 <div class="form-group">
                     <label for="phone">Phone</label>
                     <InputText id="phone" @bind-Value="account.Phone" class="form-control" />
-                    <ValidationMessage For="@(() => account.Phone)" />
                 </div>
                 <div class="form-group">
                     <label for="address">Address</label>
                     <InputText id="address" @bind-Value="account.Address" class="form-control" />
-                    <ValidationMessage For="@(() => account.Address)" />
                 </div>
                 <div class="form-group">
                     <label for="age">Age</label>
                     <InputNumber id="age" @bind-Value="account.Age" class="form-control" />
-                    <ValidationMessage For="@(() => account.Age)" />
                 </div>
-                <button type="submit" class="btn btn-primary">Create Customer</button>
+                <button type="submit" class="btn btn-primary">Criar Usuário</button>
             </div>
         </EditForm>
     </div>
@@ -50,7 +62,9 @@
     {
         try
         {
+            base.OnInitialized();
             editContext = new EditContext(account);
+            StateHasChanged();
         }
         catch(Exception ex)
         {
@@ -62,20 +76,50 @@
     {
         try
         {
-            account.UserId = Guid.NewGuid();
+            if (string.IsNullOrEmpty(account.Address) || string.IsNullOrEmpty(account.Name)
+            || string.IsNullOrEmpty(account.Email) || string.IsNullOrEmpty(account.Login)
+            || string.IsNullOrEmpty(account.Password) || string.IsNullOrEmpty(account.Phone)
+            || account.Age <= 0)
+                throw new Exception("Todos os campos devem ser preenchidos!");
 
-            if (!editContext.Validate())
+            account.Password = GetMd5Hash(account.Password);
+
+            if (editContext.Validate())
             {
-                await customerService.CreateCustomer(account);
+                var result = await customerService.CreateCustomer(account);
+
+                if (!result.Success)
+                    throw new Exception(result.Message);
+
+                navigationManager.NavigateTo("/login");
             }
             else
             {
-                editContext.Validate();
+                throw new Exception("Inválido");
             }
         }
         catch(Exception ex)
         {
             await dialogService.ShowMessageBox("Erro", ex.Message);
+        }
+    }
+
+    static string GetMd5Hash(string input)
+    {
+        using (MD5 md5 = MD5.Create())
+        {
+
+            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+
+            byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                sb.Append(hashBytes[i].ToString("x2"));
+            }
+
+            return sb.ToString();
         }
     }
 }

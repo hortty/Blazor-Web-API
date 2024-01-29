@@ -15,7 +15,7 @@ namespace Movie.Domain.Interfaces
 
         public Task<TEntity> Delete(TEntity entity);
 
-        public Task<IEnumerable<TEntity>> ListAll();
+        public Task<IEnumerable<TEntity>> ListAll<TInputDto>(TInputDto inputDto) where TInputDto: class;
 
         public Task<TEntity> ListById(TEntity entity);
     }

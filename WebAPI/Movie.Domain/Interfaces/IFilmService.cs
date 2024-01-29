@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Movie.Domain.Dtos;
+using Movie.Domain.Dtos.FilmDto;
 using Movie.Domain.Models;
 
 namespace Movie.Domain.Interfaces

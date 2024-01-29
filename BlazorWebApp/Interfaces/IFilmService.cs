@@ -14,6 +14,8 @@ namespace BlazorWebApp.Interfaces
 
         public Task<ResultDTO<List<FoundFilmDto>>> GetByName(GetFilmDto getFilmDto);
 
-        public Task<ResultDTO<PaginatedList<FoundFilmDto>>> GetAllPaginated();
+        public Task<ResultDTO<List<FoundFilmDto>>> GetAllPaginated(int page);
+
+        Task<ResultDTO<CreatedFilmDto>> CreateFilm(CreateFilmDto createFilmDto);
     }
 }

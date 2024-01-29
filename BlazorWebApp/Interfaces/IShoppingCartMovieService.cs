@@ -1,4 +1,5 @@
 ﻿using BlazorWebApp.DTOs;
+using BlazorWebApp.DTOs.Film;
 using BlazorWebApp.DTOs.ShoppingCartMovieDTO;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,6 @@ namespace BlazorWebApp.Interfaces
     {
         Task<ResultDTO<CreatedShoppingCartMovieDto>> CreateAsync(CreateShoppingCartMovieDto dto);
         Task<ResultDTO<DeletedShoppingCartMovieDTO>> DeleteAsync(DeleteShoppingCartMovieDTO dto);
-        Task<ResultDTO<List<FoundShoppingCartMovieDto>>> GetAsync();
+        Task<ResultDTO<List<FoundFilmDto>>> GetAsync(Guid shoppingCartId);
     }
 }

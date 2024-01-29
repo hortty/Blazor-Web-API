@@ -1,4 +1,5 @@
 ﻿using BlazorWebApp.DTOs;
+using BlazorWebApp.DTOs.Film;
 using BlazorWebApp.DTOs.ShoppingCartMovieDTO;
 using BlazorWebApp.Interfaces;
 using BlazorWebApp.Util;
@@ -23,7 +24,7 @@ namespace BlazorWebApp.Services
         {
             try
             {
-                adress = $"auth/authenticateUser";
+                adress = $"ShoppingCartMovie/colocarCarrinho";
                 var request = new HttpRequestMessage(HttpMethod.Post, adress);
                 request.Content = GetStringContent(dto);
 
@@ -41,9 +42,8 @@ namespace BlazorWebApp.Services
         {
             try
             {
-                adress = $"auth/authenticateUser";
-                var request = new HttpRequestMessage(HttpMethod.Post, adress);
-                request.Content = GetStringContent(dto);
+                adress = $"ShoppingCartMovie/{dto.Id}";
+                var request = new HttpRequestMessage(HttpMethod.Delete, adress);
 
                 var response = await this._httpClient.SendAsync(request);
                 var responseAsString = await response.Content.ReadAsStringAsync();
@@ -55,20 +55,20 @@ namespace BlazorWebApp.Services
             }
         }
 
-        public async Task<ResultDTO<List<FoundShoppingCartMovieDto>>> GetAsync()
+        public async Task<ResultDTO<List<FoundFilmDto>>> GetAsync(Guid shoppingCartId)
         {
             try
             {
-                adress = $"auth/authenticateUser";
-                var request = new HttpRequestMessage(HttpMethod.Post, adress);
+                adress = $"ShoppingCartMovie/getAll/{shoppingCartId}";
+                var request = new HttpRequestMessage(HttpMethod.Get, adress);
 
                 var response = await this._httpClient.SendAsync(request);
                 var responseAsString = await response.Content.ReadAsStringAsync();
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO<List<FoundShoppingCartMovieDto>>>(responseAsString);
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO<List<FoundFilmDto>>>(responseAsString);
             }
             catch(Exception ex)
             {
-                return new ResultDTO<List<FoundShoppingCartMovieDto>>(false, ex.Message, null);
+                return new ResultDTO<List<FoundFilmDto>>(false, ex.Message, null);
             }
         }
     }

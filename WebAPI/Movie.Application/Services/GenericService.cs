@@ -22,7 +22,7 @@ namespace Movie.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<TOutputDto> Create<TInputDto, TOutputDto>(TInputDto inputDto) 
+        public async virtual Task<TOutputDto> Create<TInputDto, TOutputDto>(TInputDto inputDto) 
         where TInputDto : class 
         where TOutputDto : class
         {
@@ -38,7 +38,7 @@ namespace Movie.Application.Services
             return outputDto;
         }
 
-        public async Task<TOutputDto> Delete<TInputDto, TOutputDto>(TInputDto inputDto)
+        public async virtual Task<TOutputDto> Delete<TInputDto, TOutputDto>(TInputDto inputDto)
         where TInputDto : class 
         where TOutputDto : class
         {
@@ -51,17 +51,18 @@ namespace Movie.Application.Services
             return outputDto;
         }
 
-        public virtual async Task<IEnumerable<TOutputDto>> ListAll<TOutputDto>()
+        public async virtual Task<IEnumerable<TOutputDto>> ListAll<TInputDto, TOutputDto>(TInputDto inputDto)
         where TOutputDto : class
+        where TInputDto : class
         {
-            var entitiesList = await _repository.ListAll();
+            var entitiesList = await _repository.ListAll<TInputDto>(inputDto);
 
             var outputDto = _mapper.Map<IEnumerable<TOutputDto>>(entitiesList);
 
             return outputDto;
         }
 
-        public async Task<TOutputDto> ListById<TInputDto, TOutputDto>(TInputDto inputDto)
+        public async virtual Task<TOutputDto> ListById<TInputDto, TOutputDto>(TInputDto inputDto)
         where TInputDto : class 
         where TOutputDto : class
         {
@@ -74,7 +75,7 @@ namespace Movie.Application.Services
             return outputDto;
         }
 
-        public async Task<TOutputDto> Update<TInputDto, TOutputDto>(TInputDto inputDto)
+        public async virtual Task<TOutputDto> Update<TInputDto, TOutputDto>(TInputDto inputDto)
         where TInputDto : class 
         where TOutputDto : class
         {

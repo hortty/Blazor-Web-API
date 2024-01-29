@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/css/pages/header.css" />
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
         <div class="container-fluid">
             <img src="images/logo3.png" alt="image-logo" class="image-logo">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,13 +24,6 @@
                     <a class="nav-link list-itens" href="shopping">Shopping Cart</a>
                     <a class="nav-link list-itens">Trending</a>
                 </div>
-
-                <form class="example-form">
-                    <div class="form-group">
-                        <label for="movieName">Search:</label>
-                        <input type="text" class="form-control" id="movieName" @bind="movieName" placeholder="Example: Titanic">
-                    </div>
-                </form>
 
                 <div class="icon-animation">
                     <img src="images/icone3.png" alt="image-user" class="image-user">
@@ -56,7 +49,7 @@
         }
         else
         {
-            var films = await filmService.GetAllPaginated();
+            // var films = await filmService.GetAllPaginated();
 
         }
     }

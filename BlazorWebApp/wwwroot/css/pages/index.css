@@ -17,6 +17,11 @@
     overflow: hidden;
     transform: scale(1);
     transition: transform 0.2s ease-out;
+    max-height: 520px;
+}
+
+.next-back-page {
+    background-color: mediumpurple;
 }
 
 .grid-item:hover {
@@ -27,9 +32,16 @@
     position: relative;
 }
 
+.img-container {
+    padding-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .card-img-top {
     display: block;
-    width: 100%;
+    width: 200px;
     height: auto;
 }
 

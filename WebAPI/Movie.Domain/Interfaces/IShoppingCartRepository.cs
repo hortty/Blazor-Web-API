@@ -9,5 +9,6 @@ namespace Movie.Domain.Interfaces
 {
     public interface IShoppingCartRepository : IGenericRepository<ShoppingCart>
     {
+        public Task<ShoppingCart> GetShoppingCartByUserId(Guid userId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BlazorWebApp.DTOs;
+using Movie.Domain.Dtos.UserDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,7 @@ namespace BlazorWebApp.Interfaces
 {
     public interface IAuthService
     {
-        public Task<ResultDTO<AuthorizedUser>> AuthenticateUser(AuthenticateUserDTO auth);
-        public Task<ResultDTO> RegisterUser(UserDTO user);
-        public Task<ResultDTO> RedefinePassword(UserDTO user);
-        public Task<ResultDTO> ForgetPassword(UserDTO user);
+        public Task<ResultDTO<AuthorizedUserDTO>> AuthenticateUser(AuthUserDTO authUserDTO);
 
     }
 }

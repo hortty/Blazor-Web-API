@@ -13,6 +13,7 @@ using MudBlazor.Services;
 using BlazorWebApp.Util;
 using BlazorWebApp.Interfaces;
 using BlazorWebApp.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorWebApp
 {
@@ -35,6 +36,10 @@ namespace BlazorWebApp
             services.AddHttpClient();
 
             services.Configure<ConfigAPI>(Configuration.GetSection("configAPI"));
+
+            services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            services.AddScoped<ICustomAuthStateProvider, CustomAuthStateProvider>();
+            services.AddAuthorizationCore();
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ICustomerService, CustomerService>();

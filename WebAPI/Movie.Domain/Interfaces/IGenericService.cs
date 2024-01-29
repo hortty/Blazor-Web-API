@@ -15,7 +15,7 @@ namespace Movie.Domain.Interfaces
 
         public Task<TOutputDto> Delete<TInputDto, TOutputDto>(TInputDto inputDto) where TInputDto: class where TOutputDto : class;
 
-        public Task<IEnumerable<TOutputDto>> ListAll<TOutputDto>() where TOutputDto : class;
+        public Task<IEnumerable<TOutputDto>> ListAll<TInputDto, TOutputDto>(TInputDto inputDto) where TOutputDto : class where TInputDto: class;
 
         public Task<TOutputDto> ListById<TInputDto, TOutputDto>(TInputDto inputDto) where TInputDto: class where TOutputDto : class;
     }

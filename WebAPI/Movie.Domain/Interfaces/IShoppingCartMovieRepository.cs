@@ -1,4 +1,5 @@
-﻿using Movie.Domain.Models;
+﻿using Movie.Domain.Dtos.FilmDto;
+using Movie.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace Movie.Domain.Interfaces
 {
     public interface IShoppingCartMovieRepository : IGenericRepository<ShoppingCartMovie>
     {
+        public Task<List<FoundFilmDto>> GetFilmsByShoppingCartId(Guid shoppingCartId);
     }
 }

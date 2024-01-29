@@ -11,7 +11,14 @@ using Movie.Application.Validators;
 using FluentValidation;
 using System.ComponentModel.DataAnnotations;
 using Movie.Domain.Models;
-using Movie.Domain.Dtos;
+using Movie.Domain.Dtos.CustomerDto;
+using Movie.Domain.Dtos.ShoppingCartMovieDto;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +47,9 @@ builder.Services.AddScoped<ISaleService, SaleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 builder.Services.AddScoped<IShoppingCartMovieService, ShoppingCartMovieService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<ICommentsService, CommentService>();
+builder.Services.AddScoped<IUpvoteService, UpvoteService>();
 
 // Repositories
 builder.Services.AddScoped<IFilmRepository, FilmRepository>();
@@ -48,6 +58,8 @@ builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 builder.Services.AddScoped<IShoppingCartMovieRepository, ShoppingCartMovieRepository>();
+builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
+builder.Services.AddScoped<IUpvoteRepository, UpvoteRepository>();
 
 // Validators
 builder.Services.AddTransient<IValidator<CreateShoppingCartMovieDto>, CreateShoppingCartMovieDtoValidator>();
@@ -55,6 +67,31 @@ builder.Services.AddTransient<IValidator<UpdateShoppingCartMovieDto>, UpdateShop
 builder.Services.AddTransient<IValidator<DeleteShoppingCartMovieDto>, DeleteShoppingCartMovieDtoValidator>();
 builder.Services.AddTransient<IValidator<CreateCustomerDto>, CreateCustomerDtoValidator>();
 
+builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection(nameof(MongoSettings)));
+builder.Services.AddSingleton<IMongoSettings>(sp => 
+    sp.GetRequiredService<IOptions<MongoSettings>>().Value);
+builder.Services.AddSingleton<IMongoClient>(s =>
+    new MongoClient(builder.Configuration.GetValue<string>("MongoSettings:ConnectionString")));
+
+//JWT
+var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings")["SecurityKey"]!);
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
 
 var app = builder.Build();
 

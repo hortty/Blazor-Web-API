@@ -12,17 +12,17 @@ namespace Movie.Infrastructure.Context
     {
         public DataContext(DbContextOptions options) : base(options) { }
 
-        DbSet<Customer> Customers { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
-        DbSet<Film> Films { get; set; }
+        public DbSet<Film> Films { get; set; }
 
-        DbSet<ShoppingCartMovie> ShoppingCartMovies { get; set; }
+        public DbSet<ShoppingCartMovie> ShoppingCartMovies { get; set; }
 
-        DbSet<Sale> Sales { get; set; }
+        public DbSet<Sale> Sales { get; set; }
 
-        DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
 
-        DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
 
     }
 }

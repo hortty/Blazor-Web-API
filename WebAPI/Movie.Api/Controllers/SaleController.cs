@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Movie.Domain.Dtos;
+using Movie.Domain.Dtos.SaleDto;
 using Movie.Domain.Interfaces;
 
 namespace Movie.Api.Controllers
@@ -27,7 +27,8 @@ namespace Movie.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _saleService.ListAll<FoundSaleDto>());
+            //return Ok(await _saleService.ListAll<FoundSaleDto>());
+            return Ok();
         }
 
         [HttpPost]

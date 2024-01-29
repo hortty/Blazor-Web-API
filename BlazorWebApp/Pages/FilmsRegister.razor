@@ -1,0 +1,114 @@
+﻿@page "/register-film"
+
+@using BlazorWebApp.DTOs.Customer
+@using BlazorWebApp.DTOs.Film
+@using BlazorWebApp.Interfaces
+@using BlazorWebApp.Util
+@using System
+@using MudBlazor
+@using System.ComponentModel.DataAnnotations
+@inject IDialogService dialogService
+@inject IFilmService filmService
+@attribute [Authorize(Roles = "ADMIN")]
+
+<head>
+    @* <link rel="stylesheet" href="/css/pages/createAccount.css" /> *@
+</head>
+<body>
+    <div class="align-items">
+         
+        <div class="items-container">
+            <EditForm EditContext="editContext">
+                <div class="form-group">
+                    <label for="name">Nome</label>
+                    <InputText id="name" @bind-Value="film.Name" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="age">Descrição</label>
+                    <InputText id="age" @bind-Value="film.Description" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Preço</label>
+                    <InputNumber id="phone" @bind-Value="film.Price" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="address">Quantidade</label>
+                    <InputNumber id="address" @bind-Value="film.Amount" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="address">Insira a imagem</label>
+                    <InputFile OnChange="HandleFileChange" />
+                </div>
+                <button @onclick="Upload" class="btn btn-primary">Salvar Filme</button>
+            </EditForm>
+        </div>
+
+    </div>
+</body>
+
+@code {
+    private CreateFilmDto film { get; set; }
+    private string imageUrl { get; set; }
+    EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        film = new CreateFilmDto();
+        editContext = new EditContext(film);
+        base.OnInitialized();   
+    }
+
+    private async Task HandleFileChange(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var imageFile = e.GetMultipleFiles().FirstOrDefault();
+
+            if (imageFile != null)
+            {
+                imageUrl = null;
+                var buffer = new byte[imageFile.Size];
+                await imageFile.OpenReadStream().ReadAsync(buffer);
+                imageUrl = $"data:{imageFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+            }
+        }
+        catch(Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message);
+        }
+    }
+
+    private async Task Upload()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+            {
+                throw new Exception("Por favor, insira uma imagem!");
+            }
+
+            if (film.Price <= 0 || film.Amount <= 0 || string.IsNullOrEmpty(film.Name) || string.IsNullOrEmpty(film.Description))
+                throw new Exception("Os atributos do filme precisam ser preenchidos!");
+
+            CreateFilmDto createFilmDto = new CreateFilmDto
+            {
+                Name = film.Name,
+                Price = film.Price,
+                Amount = film.Amount,
+                Description = film.Description,
+                ImagemBase64 = imageUrl
+            };
+
+            var result = await filmService.CreateFilm(createFilmDto);
+
+            if (!result.Success)
+                throw new Exception(result.Message);
+
+            await dialogService.ShowMessageBox("Sucesso", "Filme Adicionado com sucesso!");
+        }
+        catch(Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message);
+        }
+    }
+}

@@ -6,6 +6,7 @@ namespace BlazorWebApp.DTOs.Film
     {
         public Guid? Id { get; set; }
         public string Name { get; set; }
+        public int? page { get; set; }
     }
 
 

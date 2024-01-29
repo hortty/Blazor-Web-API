@@ -1,4 +1,5 @@
-﻿using Movie.Domain.Models;
+﻿using Movie.Domain.Dtos.UserDto;
+using Movie.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace Movie.Domain.Interfaces
 {
     public interface IUserRepository : IGenericRepository<User>
     {
+        Task<User> FindUserByLogin(GetUserDTO getUserDTO);
     }
 }

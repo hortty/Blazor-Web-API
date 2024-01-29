@@ -1,13 +1,23 @@
 ﻿@page "/login"
 
 @using BlazorWebApp.DTOs
-@using BlazorWebApp.Services
+@using BlazorWebApp.Interfaces
 @using System
+@using BlazorWebApp.Services
+@using Microsoft.Extensions.DependencyInjection
+@using Movie.Domain.Dtos.UserDto
 @using MudBlazor
-@inject ShoppingCartMovieService shoppingCartMovieService
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Cryptography
+@using System.Text
+@inject IShoppingCartMovieService shoppingCartMovieService
+@inject IDialogService dialogService
+@inject IAuthService authService
+@inject ICustomAuthStateProvider customAuthStateProvider
+@inject NavigationManager navigationManager
 
 <head>
-    <link rel="stylesheet" href="/css/pages/index.css" />
+    <link rel="stylesheet" href="/css/pages/login.css" />
 </head>
 <body>
     <div class="align-items">
@@ -19,10 +29,10 @@
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <InputText class="form-control" id="password" @bind-Value="userInfo.Password" name="password" required />
+                    <InputText class="form-control" id="password" type="password" @bind-Value="userInfo.Password" name="password" required />
                 </div>
                 <button type="submit" class="btn btn-primary">Login</button>
-                <a href="/account" class="sign-in-item">Create new customer</a>
+                <a href="/create-account" class="sign-in-item">Create new account</a>
             </div>
         </EditForm>
     </div>
@@ -38,8 +48,60 @@
         await base.OnInitializedAsync();
     }
 
-    private void LoginUser()
+    static string GetMd5Hash(string input)
     {
+        using (MD5 md5 = MD5.Create())
+        {
+
+            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+
+            byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                sb.Append(hashBytes[i].ToString("x2"));
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    private async Task LoginUser()
+    {
+        try
+        {
+
+            if (string.IsNullOrEmpty(userInfo.Login) ||
+                    string.IsNullOrEmpty(userInfo.Password))
+            {
+                throw new Exception("Login e Senha são obrigatórios!");
+            }
+
+            var hashedPassword = GetMd5Hash(userInfo.Password);
+
+            AuthUserDTO authUserDTO = new AuthUserDTO
+            {
+                Login = userInfo.Login,
+                PasswordHash = hashedPassword
+            };
+
+            var resultAuthorization = await authService.AuthenticateUser(authUserDTO);
+
+            if (!resultAuthorization.Success)
+                throw new Exception(resultAuthorization.Message);
+
+            var authorizedUser = resultAuthorization.ResultObj;
+
+            await customAuthStateProvider.LoginAsync(authorizedUser);
+
+            navigationManager.NavigateTo("/");
+
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message);
+        }
 
     }
 }

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Movie.Domain.Dtos;
+using Movie.Domain.Dtos.ShoppingCartMovieDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;

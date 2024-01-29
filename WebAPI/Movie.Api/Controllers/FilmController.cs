@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BlazorWebApp.DTOs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Movie.Domain.Dtos;
+using Movie.Domain.Dtos.FilmDto;
 using Movie.Domain.Interfaces;
 
 namespace Movie.Api.Controllers
@@ -31,9 +32,21 @@ namespace Movie.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Route("getAll/{page}")]
+        public async Task<IActionResult> GetAll([FromRoute] int page)
         {
-            return Ok(await _filmService.ListAll<FoundFilmDto>());
+            try
+            {
+                GetFilmDto getFilmDto = new GetFilmDto { page = page };
+
+                var filmList = await _filmService.ListAll<GetFilmDto, FoundFilmDto>(getFilmDto);
+
+                return Ok(new ResultDTO(true, "Sucess", filmList));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new ResultDTO(false, ex.Message));
+            }
         }
 
         // [HttpDelete]
@@ -43,11 +56,20 @@ namespace Movie.Api.Controllers
         //     return Ok(await _filmService.Delete<DeleteFilmDto, DeletedFilmDto>(deleteFilmDto));
         // }
 
-        // [HttpPost]
-        // public async Task<IActionResult> Create([FromBody] CreateFilmDto createFilmDto)
-        // {
-        //     return Ok(await _filmService.Create<CreateFilmDto, CreatedFilmDto>(createFilmDto));
-        // }
+        [HttpPost]
+        [Route("createFilm")]
+        public async Task<IActionResult> Create([FromBody] CreateFilmDto createFilmDto)
+        {
+            try
+            {
+                var createdFilmDto = await _filmService.Create<CreateFilmDto, CreatedFilmDto>(createFilmDto); 
+                return Ok(new ResultDTO(true, "Sucess", createdFilmDto));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new ResultDTO(false, ex.Message));
+            }
+        }
 
         // [HttpPut]
         // [Route("{Id}")]

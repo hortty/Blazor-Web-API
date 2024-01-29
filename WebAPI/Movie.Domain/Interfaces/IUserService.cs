@@ -1,3 +1,4 @@
+using Movie.Domain.Dtos.UserDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,6 @@ namespace Movie.Domain.Interfaces
 {
     public interface IUserService : IGenericService
     {
-        
+        Task<FoundUserDTO> FindUserByLogin(GetUserDTO getUserDTO);
     }
 }

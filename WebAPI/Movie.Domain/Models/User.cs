@@ -20,5 +20,8 @@ namespace Movie.Domain.Models
         [Required]
         [MaxLength(100)]
         public string PasswordHash { get; set; } = String.Empty;
+
+        [MaxLength(100)]
+        public string Role { get; set; } = String.Empty;
     }
 }

@@ -1,22 +1,13 @@
 ﻿using BlazorWebApp.DTOs;
+using System;
 
 namespace BlazorWebApp.DTOs
 {
-    public class AuthorizedUser
+    public class AuthorizedUserDTO : BaseDTO
     {
-
-        public AuthorizedUser(UserDTO usuario, string senha, Util.Enum.UserRole papel)
-        {
-            User = usuario;
-            Token = senha;
-            UserRole = papel;
-            Login = usuario.Login;
-        }
-
-        public UserDTO User { get; set; }
-        public string Token { get; set; }
-        public Util.Enum.UserRole UserRole { get; set; }
-        public string Login { get; set; }
-        
+        public string Login { get; set; } = String.Empty;
+        public string Token { get; set; } = String.Empty;
+        public string Role { get; set; } = String.Empty;
+        public Guid ShoppingCartId { get; set; }
     }
 }

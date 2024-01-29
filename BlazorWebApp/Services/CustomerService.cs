@@ -21,7 +21,7 @@ namespace BlazorWebApp.Services
         {
             try
             {
-                adress = $"auth/authenticateUser";
+                adress = $"Customer/createCustomer";
                 var request = new HttpRequestMessage(HttpMethod.Post, adress);
                 request.Content = GetStringContent(createCustomerDto);
 

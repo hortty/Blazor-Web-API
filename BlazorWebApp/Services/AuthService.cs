@@ -2,6 +2,7 @@
 using BlazorWebApp.Interfaces;
 using BlazorWebApp.Util;
 using Microsoft.Extensions.Options;
+using Movie.Domain.Dtos.UserDto;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -16,76 +17,21 @@ namespace BlazorWebApp.Services
             _myConfiguration = myConfiguration.Value;
         }
 
-        public async Task<ResultDTO<AuthorizedUser>> AuthenticateUser(AuthenticateUserDTO auth)
+        public async Task<ResultDTO<AuthorizedUserDTO>> AuthenticateUser(AuthUserDTO authUserDTO)
         {
             try
             {
-                adress = $"auth/authenticateUser";
+                adress = $"Login/logarUsuario";
                 var request = new HttpRequestMessage(HttpMethod.Post, adress);
-                request.Content = GetStringContent(auth);
+                request.Content = GetStringContent(authUserDTO);
 
                 var response = await this._httpClient.SendAsync(request);
                 var responseAsString = await response.Content.ReadAsStringAsync();
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO<AuthorizedUser>>(responseAsString);
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO<AuthorizedUserDTO>>(responseAsString);
             }
             catch(Exception ex)
             {
-                return new ResultDTO<AuthorizedUser>(false, ex.Message, null);
-            }
-        }
-
-        public async Task<ResultDTO> ForgetPassword(UserDTO user)
-        {
-            try
-            {
-                adress = $"auth/forgetPassword";
-                var request = new HttpRequestMessage(HttpMethod.Post, adress);
-                request.Content = GetStringContent(user);
-
-                var response = await this._httpClient.SendAsync(request);
-                var responseAsString = await response.Content.ReadAsStringAsync();
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO>(responseAsString);
-            }
-            catch (Exception ex)
-            {
-                return new ResultDTO(false, ex.Message);
-            }
-        }
-
-        public async Task<ResultDTO> RedefinePassword(UserDTO user)
-        {
-            try
-            {
-                adress = $"auth/redefinePassword";
-                var request = new HttpRequestMessage(HttpMethod.Post, adress);
-                request.Content = GetStringContent(user);
-
-                var response = await this._httpClient.SendAsync(request);
-
-                var responseAsString = await response.Content.ReadAsStringAsync();
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO>(responseAsString);
-            }
-            catch (Exception ex)
-            {
-                return new ResultDTO(false, ex.Message);
-            }
-        }
-
-        public async Task<ResultDTO> RegisterUser(UserDTO user)
-        {
-            try
-            {
-                adress = $"auth/registerUser";
-                var request = new HttpRequestMessage(HttpMethod.Post, adress);
-                request.Content = GetStringContent(user);
-
-                var response = await this._httpClient.SendAsync(request);
-                var responseAsString = await response.Content.ReadAsStringAsync();
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO>(responseAsString);
-            }
-            catch (Exception ex)
-            {
-                return new ResultDTO(false, ex.Message);
+                return new ResultDTO<AuthorizedUserDTO>(false, ex.Message, null);
             }
         }
     }

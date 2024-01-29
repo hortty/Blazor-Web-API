@@ -19,23 +19,6 @@ namespace BlazorWebApp.Services
             _myConfiguration = myConfiguration.Value;
         }
 
-        public async Task<ResultDTO<PaginatedList<FoundFilmDto>>> GetAllPaginated()
-        {
-            try
-            {
-                adress = $"auth/authenticateUser";
-                var request = new HttpRequestMessage(HttpMethod.Post, adress);
-
-                var response = await this._httpClient.SendAsync(request);
-                var responseAsString = await response.Content.ReadAsStringAsync();
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO<PaginatedList<FoundFilmDto>>>(responseAsString);
-            }
-            catch (Exception ex)
-            {
-                return new ResultDTO<PaginatedList<FoundFilmDto>>(false, ex.Message, null);
-            }
-        }
-
         public async Task<ResultDTO<FoundFilmDto>> GetById(GetFilmDto getFilmDto)
         {
             try
@@ -67,6 +50,41 @@ namespace BlazorWebApp.Services
                 return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO<List<FoundFilmDto>>>(responseAsString);
             }
             catch(Exception ex)
+            {
+                return new ResultDTO<List<FoundFilmDto>>(false, ex.Message, null);
+            }
+        }
+
+        public async Task<ResultDTO<CreatedFilmDto>> CreateFilm(CreateFilmDto createFilmDto)
+        {
+            try
+            {
+                adress = $"Film/createFilm";
+                var request = new HttpRequestMessage(HttpMethod.Post, adress);
+                request.Content = GetStringContent(createFilmDto);
+
+                var response = await this._httpClient.SendAsync(request);
+                var responseAsString = await response.Content.ReadAsStringAsync();
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO<CreatedFilmDto>>(responseAsString);
+            }
+            catch (Exception ex)
+            {
+                return new ResultDTO<CreatedFilmDto>(false, ex.Message, null);
+            }
+        }
+
+        public async Task<ResultDTO<List<FoundFilmDto>>> GetAllPaginated(int page)
+        {
+            try
+            {
+                adress = $"Film/getAll/{page}";
+                var request = new HttpRequestMessage(HttpMethod.Get, adress);
+
+                var response = await this._httpClient.SendAsync(request);
+                var responseAsString = await response.Content.ReadAsStringAsync();
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<ResultDTO<List<FoundFilmDto>>>(responseAsString);
+            }
+            catch (Exception ex)
             {
                 return new ResultDTO<List<FoundFilmDto>>(false, ex.Message, null);
             }

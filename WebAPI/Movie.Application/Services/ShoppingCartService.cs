@@ -10,8 +10,19 @@ namespace Movie.Application.Services
 {
     public class ShoppingCartService : GenericService<ShoppingCart, IShoppingCartRepository>, IShoppingCartService
     {
-        public ShoppingCartService(IShoppingCartRepository repository, IMapper mapper) : base(repository, mapper)
+        protected readonly IShoppingCartRepository _shoppingCartRepository;
+        public ShoppingCartService(IShoppingCartRepository repository, IMapper mapper, IShoppingCartRepository shoppingCartRepository) : base(repository, mapper)
         {
+            _shoppingCartRepository = shoppingCartRepository;
+        }
+
+        public async Task<ShoppingCart> GetShoppingCartByUserId(Guid userId)
+        {
+            var shoppingCart = await _shoppingCartRepository.GetShoppingCartByUserId(userId);
+
+            if (shoppingCart == null) throw new Exception("Carrinho não encontrado");
+
+            return shoppingCart;
         }
     }
 }

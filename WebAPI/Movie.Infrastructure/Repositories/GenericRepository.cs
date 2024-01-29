@@ -43,14 +43,35 @@ namespace Movie.Infrastructure.Repositories
             return removedEntity.Entity;
         }
 
-        public async virtual Task<IEnumerable<TEntity>> ListAll()
+        public async virtual Task<IEnumerable<TEntity>> ListAll<TInputDto>(TInputDto inputDto)
+        where TInputDto: class
         {
-            var foundEntities = await _dbSet.AsNoTracking().Skip(0).Take(10).ToListAsync();
+            if(inputDto != null)
+            {
+                var prop = inputDto.GetType().GetProperty("page");
+                var propValue = prop.GetValue(inputDto) ?? 1;
+                int qtde = 8;
 
-            if (foundEntities.Equals(null))
-                throw new InvalidOperationException($"Entities not found.");
+                var foundEntities = await _dbSet
+                    .AsNoTracking()
+                    .Skip((((int)propValue - 1 ) * qtde))
+                    .Take(qtde)
+                    .ToListAsync();
 
-            return foundEntities;
+                if (foundEntities.Equals(null))
+                    throw new InvalidOperationException($"Entities not found.");
+
+                return foundEntities;
+            }
+            else
+            {
+                var foundEntities = await _dbSet.AsNoTracking().ToListAsync();
+
+                if (foundEntities.Equals(null))
+                    throw new InvalidOperationException($"Entities not found.");
+
+                return foundEntities;
+            }
         }
 
         public async virtual Task<TEntity> ListById(TEntity entity)
@@ -78,7 +99,15 @@ namespace Movie.Infrastructure.Repositories
             {
                 var propValue = prop.GetValue(entity);
 
-                if((propValue is not int && propValue != null) || (propValue is int && (int)propValue != 0))
+                if (propValue is DateTime dateTimeValue)
+                {
+                    if (dateTimeValue.Kind == DateTimeKind.Local)
+                    {
+                        propValue = DateTime.SpecifyKind(dateTimeValue, DateTimeKind.Utc);
+                    }
+                }
+
+                if ((propValue is not int && propValue != null) || (propValue is int && (int)propValue != 0))
                 {
                     foundEntity!.GetType()?.GetProperty(prop.Name)?.SetValue(foundEntity, propValue);
                 }
