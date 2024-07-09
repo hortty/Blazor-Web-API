@@ -1,0 +1,174 @@
+﻿@page "/shopping-cart"
+
+@using BlazorWebApp.DTOs
+@using BlazorWebApp.DTOs.Film
+@using BlazorWebApp.DTOs.ShoppingCartMovieDTO
+@using BlazorWebApp.Interfaces
+@using BlazorWebApp.Services
+@using BlazorWebApp.Util
+@using System
+@using MudBlazor
+@using System.Security.Claims
+@inject IShoppingCartMovieService shoppingCartMovieService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject IDialogService dialogService
+@attribute [Authorize(Roles = "DEFAULT, ADMIN")]
+
+<head>
+    <link rel="stylesheet" href="/css/pages/index.css" />
+</head>
+<body>
+    <h1 class="text-center mb-4">Carrinho de compras</h1>
+    @if (cartItems.Count == 0 || loading)
+    {
+        <div class="text-center mb-4">
+            <h3>Vazio</h3>
+        </div>
+    }
+    else
+    {
+        @* <table class="table table-bordered table-hover mb-4">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Filme</th>
+                    <th>Preço</th>
+                    <th>Excluir</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in cartItems)
+                {
+                    <tr>
+                        <td><img src="@($"data:image/png;base64,{item.Image}")" style="width: 150px; height: auto;" /></td>
+                        <td>@item.Name</td>
+                        <td>@string.Format("{0:C}", item.Price)</td>
+                        <td>
+                            <i class="bi bi-x-circle-fill" style="color: red; font-size: 1.3rem; cursor: pointer;"
+                               @onclick="@(() => DeleteItem(item.Id))"></i>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-right">Total:</td>
+                    <td>@string.Format("{0:C}", GetTotal())</td>
+                </tr>
+            </tfoot>
+        </table> *@
+
+        <table class="table table-bordered table-hover mb-4">
+            <thead>
+                <tr>
+                    <th style="max-width: 50px; overflow: hidden;">Filme</th>
+                    <th>Preço</th>
+                    <th>Excluir</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in cartItems)
+                {
+                    <tr>
+                        <td style="max-width: 50px; overflow: hidden;">
+                            <img src="@($"data:image/png;base64,{item.Image}")" style="width: 150px; height: auto; max-width: 150px; overflow: hidden;" />
+                            <span class="pl-4">@item.Name</span>
+                        </td>
+                        <td>@string.Format("{0:C}", item.Price)</td>
+                        <td>
+                            <i class="bi bi-x-circle-fill" style="color: red; font-size: 1.3rem; cursor: pointer;"
+                               @onclick="@(() => DeleteItem(item.Id))"></i>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="text-right" style="max-width: 100px; overflow: hidden;">Total:</td>
+                    <td colspan="2" style="max-width: 100px; overflow: hidden; font-weight:600; ">@string.Format("{0:C}", GetTotal())</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="text-right">
+            <button type="button" class="btn btn-primary ml-2" @onclick="Checkout">Finalizar compra</button>
+        </div>
+    }
+</body>
+
+@code {
+    List<FoundFilmDto> cartItems = new List<FoundFilmDto>();
+    bool loading = true;
+    Guid shoppingCartId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity.IsAuthenticated)
+            {
+                Guid.TryParse(user.FindFirst(ClaimTypes.UserData)?.Value, out shoppingCartId);
+            }
+
+            var result = await shoppingCartMovieService.GetAsync(shoppingCartId);
+
+            if (!result.Success)
+                throw new Exception(result.Message);
+
+            cartItems = result.ResultObj;
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    decimal GetTotal()
+    {
+        return cartItems.Sum(item => item.Price);
+    }
+
+    void ClearCart()
+    {
+        cartItems.Clear();
+    }
+
+    public async Task Checkout()
+    {
+        var total = GetTotal();
+        await dialogService.ShowMessageBox("Compra", $"Você tem certeza que deseja adquirir esse filmes por R$ {total.ToString("0.00")} ?", "Confirmar", "Cancelar");
+    }
+
+    async Task DeleteItem(Guid id)
+    {
+        var index = cartItems.FindIndex(cartItem => cartItem.Id == id);
+
+        var deleteShoppingCartMovieDto = new DeleteShoppingCartMovieDTO
+        {
+            Id = id
+        };
+
+        try
+        {
+            var deletedItem = await shoppingCartMovieService.DeleteAsync(deleteShoppingCartMovieDto);
+            cartItems.RemoveAt(index);
+        }
+        catch (Exception)
+        {
+            // Handle error
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}

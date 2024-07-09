@@ -1,0 +1,122 @@
+﻿@page "/user-log"
+
+@using BlazorWebApp.DTOs.Customer
+@using BlazorWebApp.DTOs.Film
+@using BlazorWebApp.DTOs.OrderDto
+@using BlazorWebApp.Interfaces
+@using BlazorWebApp.Util
+@using System
+@using Movie.Domain.Dtos.UserDto
+@using MudBlazor
+@using System.ComponentModel.DataAnnotations
+@inject IDialogService dialogService
+@inject IEmailService emailService
+@inject IUserService userService
+@attribute [Authorize(Roles = "ADMIN")]
+
+<head>
+    <link rel="stylesheet" href="/css/pages/filmsRegister.css" />
+</head>
+<body>
+    @* <div class="card align-items card-effect">
+        <div class="card-body mx-8">
+
+            @if (listUser != null && listUser.Count > 0)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">UserName</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in listUser)
+                        {
+                            <tr>
+                                <td>@user.Username</td>
+                                <td>@user.Email</td>
+                                <td>@user.Role</td>
+                            </tr>
+                        }
+                    
+                    </tbody>
+                </table>
+            }
+
+        </div>
+    </div> *@
+    <div class="card align-items card-effect">
+        <div class="card-body mx-8">
+
+            <div class="items-container">
+                <EditForm EditContext="editContext" OnValidSubmit="Sent">
+                    <div class="form-group">
+                        <label for="title">Título</label>
+                        <InputText id="title" @bind-Value="createOrderDto.Title" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="contentBody">Conteúdo email</label>
+                        <textarea id="contentBody" @bind="createOrderDto.ContentBody" class="form-control" rows="5"></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-outline-dark">Enviar</button>
+                    </div>
+                </EditForm>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+@code {
+    private string imageUrl { get; set; }
+    EditContext editContext;
+    CreateOrderDto createOrderDto { get; set; }
+    List<FoundUserDTO> listUser = new List<FoundUserDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            base.OnInitialized();   
+            createOrderDto = new CreateOrderDto();
+            editContext = new EditContext(createOrderDto);
+            // var userResult = await userService.GetAll();
+
+            // if (userResult == null || !userResult.Success)
+            //     throw new Exception("Erro ao obter usuários");
+
+            // listUser = userResult.ResultObj;
+
+        }
+        catch(Exception ex)
+        {
+            
+        }
+    }
+
+    private async Task Sent()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(createOrderDto.Title) || string.IsNullOrEmpty(createOrderDto.ContentBody))
+            {
+                throw new Exception("Há elementos vazios, não foi possível enviar o email.");
+            }
+
+            var result = await emailService.CreateOrder(createOrderDto);
+
+            if (!result.Success)
+                throw new Exception(result.Message);
+
+            await dialogService.ShowMessageBox("Sucesso", "Enviado!");
+        }
+        catch(Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message);
+        }
+    }
+}

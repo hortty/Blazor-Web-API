@@ -1,0 +1,6 @@
+﻿.card-effect:hover {
+    position: relative;
+    top: -3px;
+    box-shadow: 0 12px 12px hsla(0, 0%, 10%, 0.3);
+    transition: all .3s ease-in-out;
+}

@@ -1,0 +1,221 @@
+﻿@using BlazorWebApp.DTOs.CommentDto
+@using BlazorWebApp.DTOs.UpvoteDto
+@using BlazorWebApp.Interfaces
+@using BlazorWebApp.DTOs.Film
+@inject IDialogService dialogService
+@inject ICommentService commentService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject IUpvoteService upvoteService
+@using System.IO;
+@using System.Security.Claims
+@using Movie.Domain.Dtos.CustomerDto
+@attribute [Authorize(Roles = "DEFAULT, ADMIN")]
+
+<head>
+    <link rel="stylesheet" href="/css/pages/filmDetail.css" />
+
+</head>
+<body>
+    <main>
+        <MudDialog Style="min-width: 80%;">
+            <TitleContent>
+                <div style="padding: 0.1rem; margin-bottom: 0.3rem;">
+                    <MudIconButton Icon="@Icons.Material.Filled.Close" @onclick="@(() => Close())"></MudIconButton>
+                </div>
+            </TitleContent>
+            <DialogContent>
+                @if (FoundFilmDto == null)
+                {
+                    <p>Filme não encontrado</p>
+                }
+                else
+                {
+                    <div class="d-flex">
+                        <div>
+                            <img src="@($"data:image/png;base64,{FoundFilmDto.Image}")" style="width: 300px; height: auto;" />
+                        </div>
+
+                        <div>
+                            <div class="pl-5">
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h2>@FoundFilmDto.Name</h2>
+
+                                    @if(rating != null)
+                                    {
+                                        <div class="star">
+                                            <h2><i class="bi bi-star"></i></h2>
+                                            <h2 class="pt-2 pl-2">@rating.Value.ToString("0.00")</h2>
+                                        </div>
+                                    }
+                                </div>
+
+                                <MudSlider Class="w-25" Style="margin-top: 2rem; padding-right: 0.5rem;" @bind-Value="vote" Min="0" Max="5" Color="Color.Info">@vote.ToString()</MudSlider>
+                                <MudButton Style="margin-bottom: 1rem;" Color="Color.Primary" OnClick="Vote" Disabled="@disabled" Variant="Variant.Outlined">Votar</MudButton>
+
+                            </div>
+
+                            <div class="chat-container comment-section">
+                                @if (comentarios != null)
+                                {
+                                    @foreach (var comentario in comentarios)
+                                    {
+                                        <div class="card chat-card">
+                                            <div class="card-body">
+                                                <h6 class="card-subtitle mb-2 text-muted">@comentario.UserName</h6>
+                                                <p class="card-text">@comentario.Content</p>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <p>Nenhum comentário disponível.</p>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </DialogContent>
+            <DialogActions>
+                <div class="comment-input-area">
+                    <MudTextField T="string" @bind-Value="@filmComment" Label="Comentário" Variant="Variant.Outlined" Lines="3" />
+                    <MudButton Color="Color.Primary" OnClick="Enviar">Enviar</MudButton>
+                </div>
+            </DialogActions>
+        </MudDialog>
+    </main>
+</body>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public FoundFilmDto FoundFilmDto { get; set; }
+
+    public Guid userId;
+
+    string filmComment { get; set; }
+
+    public double vote = 0;
+
+    GetUpvoteRatingDto rating = null;
+
+    List<FoundCommentDto> comentarios = null;
+
+    bool disabled { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            disabled = true;
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity.IsAuthenticated)
+            {
+                Guid.TryParse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value, out userId);
+            }
+
+            var comments = await commentService.GetByFilmId(FoundFilmDto.Id);
+
+            if (!comments.Success)
+                throw new Exception(comments.Message);
+
+            comentarios = comments.ResultObj;
+
+            var upvotes = await upvoteService.UpvoteRating(FoundFilmDto.Id);
+
+            if (!upvotes.Success)
+                throw new Exception(upvotes.Message);
+
+            rating = upvotes.ResultObj;
+
+            disabled = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message, "Ok");
+        }
+    }
+
+    private void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    private async Task Vote()
+    {
+        try
+        {
+            disabled = true;
+            int voteValue = Convert.ToInt32(vote);
+
+            CreateUpvoteDto createUpvoteDto = new CreateUpvoteDto
+            {
+                UserId = userId,
+                Value = voteValue,
+                FilmId = FoundFilmDto.Id
+            };
+
+            var created = await upvoteService.Create(createUpvoteDto);
+
+            if (created == null) throw new Exception("Um erro ocorreu!");
+
+            var upvotes = await upvoteService.UpvoteRating(FoundFilmDto.Id);
+
+            if (!upvotes.Success)
+                throw new Exception(upvotes.Message);
+
+            rating = upvotes.ResultObj;
+
+            StateHasChanged();
+            
+        }
+        catch (Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message, "Ok");
+        }
+    }
+
+
+    private async Task Enviar()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(filmComment))
+            {
+                await dialogService.ShowMessageBox("Erro", "Não é possível enviar uma mensagem vazia!", "Ok");
+            }
+            else
+            {
+                CreateCommentDto createCommentDto = new CreateCommentDto
+                {
+                    UserId = userId,
+                    Content = filmComment,
+                    FilmId = FoundFilmDto.Id
+                };
+
+                var created = await commentService.Create(createCommentDto);
+
+                filmComment = string.Empty;
+
+                if (created == null) throw new Exception("Um erro ocorreu durante a criação do comentário!");
+
+                var comments = await commentService.GetByFilmId(FoundFilmDto.Id);
+
+                if (!comments.Success)
+                    throw new Exception(comments.Message);
+
+                comentarios = comments.ResultObj;
+
+                StateHasChanged();
+            }
+        }
+        catch(Exception ex)
+        {
+            await dialogService.ShowMessageBox("Erro", ex.Message, "Ok");
+        }
+    }
+
+}

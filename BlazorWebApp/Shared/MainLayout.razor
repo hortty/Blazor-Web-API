@@ -1,0 +1,106 @@
+﻿@inherits LayoutComponentBase
+@using System.IO
+@inject Microsoft.JSInterop.IJSRuntime jsRuntime
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Forms
+@inject Microsoft.AspNetCore.Components.NavigationManager navigationManager
+@using Microsoft.JSInterop
+@using System.ComponentModel.DataAnnotations
+@using System.Text.Json
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using System.Security.Claims
+@attribute [Authorize]
+
+<div class="page">
+    @* <div class="sidebar">
+        <NavMenu />
+    </div> *@
+
+    <div class="d-flex flex-column vw-100">]
+
+
+        <div class="main">
+            @* <div class="top-row px-4">
+                <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            </div> *@
+            <BlazorWebApp.Pages.Header></BlazorWebApp.Pages.Header>
+
+            <AuthorizeView Roles="ADMINISTRADOR,ADMIN">
+                <Authorized>
+                    <MudDrawer Style="" @bind-Open="_drawerOpen">
+                        <MudDrawerHeader style="background-color: #034777; height: 48px; width: 250px; color: white; vertical-align: middle; align-content: center; align-items: center">
+                            <MudText Typo="Typo.button">Teste</MudText>
+                        </MudDrawerHeader>
+
+                        <NavMenu />
+
+                    </MudDrawer>
+                </Authorized>
+            </AuthorizeView>
+
+            <div class="content px-4 mt-12">
+                @Body
+            </div>
+        
+        </div>
+
+        <BlazorWebApp.Pages.Footer></BlazorWebApp.Pages.Footer>
+    </div>
+
+
+</div>
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@code {
+    bool _drawerOpen = true;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        _drawerOpen = false;
+
+        if (user.Identity != null)
+        {
+            if (!user.Identity.IsAuthenticated)
+            {
+
+                navigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                var authState1 = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var identity = authState1.User.Identity as ClaimsIdentity;
+
+                _drawerOpen = true;
+                if (identity != null)
+                {
+                    var claims = from c in identity.Claims
+                                 select new
+                                 {
+                                     subject = c.Subject.Name,
+                                     type = c.Type,
+                                     value = c.Value
+                                 };
+
+                    _drawerOpen = false;
+                }
+
+                StateHasChanged();
+            }
+        }
+    }
+}

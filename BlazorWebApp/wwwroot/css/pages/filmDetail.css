@@ -1,0 +1,32 @@
+﻿.chat-container {
+    max-width: 600px !important;
+    margin: auto !important;
+    padding: 20px !important;
+}
+
+.chat-card {
+    margin-bottom: 10px !important;
+    border-radius: 15px !important;
+}
+
+.star {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.comment-section {
+    max-height: 250px !important;
+    overflow-y: auto !important;
+    min-width: 600px !important;
+    padding-left: 5rem !important;
+}
+
+.comment-input-area {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 1rem !important;
+    min-width: 65% !important;
+    margin-bottom: 1rem !important;
+    padding-right: 1rem !important;
+}

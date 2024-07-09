@@ -1,0 +1,62 @@
+﻿body {
+    color: #ffffff;
+    background-color: #9c27b0;
+}
+
+.form-group {
+    min-width: 350px;
+}
+
+.form-group label {
+    color: #ffffff;
+}
+
+.form-control {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.btn-primary {
+    background-color: #6f1080;
+    border-color: #581464;
+    color: #ffffff;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #3e0a55;
+    border-color: #1f0729;
+    color: #ffffff;
+}
+
+.form-container {
+    max-width: 600px;
+    margin: 15rem;
+    background-color: #9c27b0;
+    border-radius: 30px;
+    padding: 1rem;
+    padding-right: 2rem;
+    padding-right: 2rem;
+}
+
+.items-container {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+    min-width: 600px;
+}
+
+.form-container {
+    margin: 15rem;
+    background-color: #9c27b0;
+    border-radius: 30px;
+    padding: 1rem;
+    padding-right: 2rem;
+    padding-right: 2rem;
+}
+
+.align-items {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem;
+}

@@ -1,0 +1,93 @@
+﻿@page "/header"
+
+@using BlazorWebApp.DTOs.Film
+@using BlazorWebApp.Interfaces
+@using BlazorWebApp.Util
+@using System
+@using MudBlazor
+@using System.Security.Claims
+@inject IDialogService dialogService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject ICustomAuthStateProvider customAuthStateProvider
+@inject NavigationManager navigationManager
+
+<head>
+    <link rel="stylesheet" href="/css/pages/header.css" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+        <div class="container-fluid">
+            <img src="images/logo3.png" alt="image-logo" class="image-logo">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse navbar-global-itens" id="navbarNavAltMarkup">
+
+                <div class="navbar-nav">
+                    <a class="nav-link list-itens" href="index">Home</a>
+                    <AuthorizeView>
+                        <a class="nav-link list-itens" href="shopping-cart">Shopping Cart</a>
+                        <a class="nav-link list-itens" href="register-film">Register Movie</a>
+                    </AuthorizeView>
+
+                    <AuthorizeView Roles="ADMIN">
+                        <a class="nav-link list-itens" href="user-log">Log Users</a>
+                    </AuthorizeView>
+                </div>
+
+                <div class="icon-animation">
+                    <img src="images/icone3.png" alt="image-user" class="image-user">
+                    @if (isLogged)
+                    {
+                        <a @onclick="LogOut" class="login-item">Log out</a>
+                    }
+                    else
+                    {
+                        <a href="login" class="login-item">Log in</a>
+                    }
+                    <!-- <span class="login-item">Please, login</span> -->
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+
+@code {
+    private string movieName = "";
+    bool isLogged = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user != null && user.Identity != null && user.Identity.IsAuthenticated)
+            {
+                isLogged = true;
+                StateHasChanged();
+            }
+        }
+        catch(Exception ex)
+        {
+
+        }
+    }
+
+    protected async Task LogOut()
+    {
+        try
+        {
+            await customAuthStateProvider.LogoutAsync();
+            isLogged = false;
+            StateHasChanged();
+            navigationManager.NavigateTo("login", true);
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+}
