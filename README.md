@@ -1,2 +1,3 @@
 # Blazor-Web-API
-Blazor Server + ASP.NET Core
+
+This application is a movie catalog, where the user can interact by buying movies or upvoting them. I built it using Blazor Server + ASP.NET Core 6.
